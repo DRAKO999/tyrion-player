@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;MediaPlayerPoC/res/raw/Po Nee Po The Pain Of Love.mp3&apos; to &apos;Po.mp3&apos;" description="Rename resource &apos;Po Nee Po The Pain Of Love.mp3&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="res/raw/Po Nee Po The Pain Of Love.mp3" name="Po.mp3" stamp="1343021487558" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;MediaPlayerPoC/res/raw/Po.mp3&apos; to &apos;po.mp3&apos;" description="Rename resource &apos;Po.mp3&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="res/raw/Po.mp3" name="po.mp3" stamp="1343021537424" updateReferences="true"/>
+</session>
