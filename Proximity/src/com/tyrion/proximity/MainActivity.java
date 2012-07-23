@@ -1,5 +1,8 @@
 package com.tyrion.proximity;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,17 +16,39 @@ public class MainActivity extends Activity implements SensorEventListener{
 
 	SensorManager proximitySensorManager;
 	Sensor proximitySensor;
-	float maxSensorRange;
+	
+	boolean validFirstTapFlag;
+	float nearProximityValue;
+	float farProximityValue;
+	long firstProximityClose;
+	long secondProximityClose;
+	long secondProximityFar;
+	long firstProximityFar;
+	
+	Timer tapDifferenceTimer;
+	Toast tapToast;
+	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        
+    	super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     
         proximitySensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         proximitySensor = proximitySensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-    
-        maxSensorRange = proximitySensor.getMaximumRange();
-    
+		tapDifferenceTimer = new Timer("gapTimer", true);
+		
+        farProximityValue = proximitySensor.getMaximumRange();
+        nearProximityValue = 0;
+
+    	firstProximityClose = 0;
+    	secondProximityClose = 0;
+    	secondProximityFar = 0;
+    	firstProximityFar = 0;
+    	
+    	validFirstTapFlag = false;
+        
     }
 
     @Override
@@ -34,16 +59,78 @@ public class MainActivity extends Activity implements SensorEventListener{
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-	
-	
+		
 	}
 
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
+		if(event.values[0] == nearProximityValue) {
 
-		Toast t = Toast.makeText(getApplicationContext(), maxSensorRange+"" , Toast.LENGTH_SHORT);
-		t.show();	
-		
+			System.out.println("near");
+			
+			if(!validFirstTapFlag) {
+			
+				firstProximityClose = event.timestamp;
+			
+			}
+			else {
+				
+				secondProximityClose = event.timestamp;
+								
+			}
+			
+		}
+		else if(event.values[0] == farProximityValue) {
+			
+			System.out.println("far");
+			
+			if(!validFirstTapFlag) {
+				
+				firstProximityFar = event.timestamp;
+				
+				if((firstProximityFar - firstProximityClose)/1000000000 < 2) {
+				
+					validFirstTapFlag = true;		
+					
+					tapDifferenceTimer.schedule( new TimerTask() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							if(validFirstTapFlag) {
+								
+								validFirstTapFlag = false;
+
+								System.out.println("Single Tap");
+							
+							}
+						}
+					}, 2000);
+
+					
+				}
+
+			}
+			else {
+				
+				secondProximityFar = event.timestamp;
+				
+				try {
+					tapDifferenceTimer.purge();
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+				if((secondProximityFar - secondProximityClose)/1000000000 < 2) {
+					
+					validFirstTapFlag = false;
+					System.out.println("Double Tap");
+					
+				}
+					
+			}
+				
+		}
 	}
 	
 	@Override
