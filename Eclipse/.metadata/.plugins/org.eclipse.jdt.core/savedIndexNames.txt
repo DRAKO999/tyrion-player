@@ -1,0 +1,3 @@
+INDEX VERSION 1.126+/home/drako/Work/Eclipse/.metadata/.plugins/org.eclipse.jdt.core
+291882883.index
+597093175.index
