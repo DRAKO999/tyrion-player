@@ -4,11 +4,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.view.Menu;
 import android.widget.Toast;
 
@@ -18,16 +22,18 @@ public class MainActivity extends Activity implements SensorEventListener{
 	Sensor proximitySensor;
 	
 	boolean validFirstTapFlag;
+	
 	float nearProximityValue;
 	float farProximityValue;
-	long firstProximityClose;
-	long secondProximityClose;
+	
+	long firstProximityNear;
+	long secondProximityNear;
 	long secondProximityFar;
 	long firstProximityFar;
 	
 	Timer tapDifferenceTimer;
-	Toast tapToast;
 	
+	WakeLock mWakeLock;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,12 +48,16 @@ public class MainActivity extends Activity implements SensorEventListener{
         farProximityValue = proximitySensor.getMaximumRange();
         nearProximityValue = 0;
 
-    	firstProximityClose = 0;
-    	secondProximityClose = 0;
+    	firstProximityNear = 0;
+    	secondProximityNear = 0;
     	secondProximityFar = 0;
     	firstProximityFar = 0;
     	
     	validFirstTapFlag = false;
+
+    	PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(pm.PARTIAL_WAKE_LOCK, "");
+        mWakeLock.acquire();
         
     }
 
@@ -70,12 +80,12 @@ public class MainActivity extends Activity implements SensorEventListener{
 			
 			if(!validFirstTapFlag) {
 			
-				firstProximityClose = event.timestamp;
+				firstProximityNear = event.timestamp;
 			
 			}
 			else {
 				
-				secondProximityClose = event.timestamp;
+				secondProximityNear = event.timestamp;
 								
 			}
 			
@@ -88,7 +98,7 @@ public class MainActivity extends Activity implements SensorEventListener{
 				
 				firstProximityFar = event.timestamp;
 				
-				if((firstProximityFar - firstProximityClose)/1000000000 < 2) {
+				if((firstProximityFar - firstProximityNear)/1000000000 < 1) {
 				
 					validFirstTapFlag = true;		
 					
@@ -121,7 +131,7 @@ public class MainActivity extends Activity implements SensorEventListener{
 					e.printStackTrace();
 				}
 				
-				if((secondProximityFar - secondProximityClose)/1000000000 < 2) {
+				if((secondProximityFar - secondProximityNear)/1000000000 < 2) {
 					
 					validFirstTapFlag = false;
 					System.out.println("Double Tap");
@@ -137,7 +147,7 @@ public class MainActivity extends Activity implements SensorEventListener{
 	  protected void onResume() {
 	    // Register a listener for the sensor.
 	    super.onResume();
-	    proximitySensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+	    proximitySensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_FASTEST);
 	  
 	}
 
