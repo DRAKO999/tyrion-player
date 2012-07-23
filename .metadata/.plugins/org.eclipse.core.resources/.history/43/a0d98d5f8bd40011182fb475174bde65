@@ -1,0 +1,53 @@
+package com.payoda.mediaplayerpoc;
+
+import java.io.IOException;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.widget.MediaController;
+import android.support.v4.app.NavUtils;
+
+public class TyrionPlayer extends Activity {
+	MediaController mc;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tyrion_player);
+        MediaPlayer mp=new MediaPlayer();
+        try 
+        {
+			mp.setDataSource("/sdcard/songs/idhayam.mp3");
+		}
+        catch (IllegalArgumentException e) 
+        {
+			e.printStackTrace();
+		}
+        catch (IllegalStateException e) 
+        {
+			e.printStackTrace();
+		}
+        catch (IOException e) 
+        {
+			e.printStackTrace();
+		}        
+        mc=new MediaController(this);
+        
+        
+        public boolean onTouchEvent(MotionEvent event) {
+            //the MediaController will hide after 3 seconds - tap the screen to make it appear again
+            mc.show();
+            return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_tyrion_player, menu);
+        return true;
+    }
+
+    
+}
